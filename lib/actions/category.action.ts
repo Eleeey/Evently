@@ -15,14 +15,14 @@ export const createCategory = async ({
 
     JSON.parse(JSON.stringify(newCategory));
   } catch (error) {
-    handleError(error);
+  //  console.log(error);
   }
 };
 
 export const getAllCategories = async () => {
   try {
     await connectToDatabase();
-
+    
     const categories = await Category.find();
 
     return JSON.parse(JSON.stringify(categories));

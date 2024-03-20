@@ -35,21 +35,22 @@ const Dropdown = ({ value, onChangeHandler }: DropdownProps) => {
 
   const handleAddCategory = () => {
     createCategory({
-      categoryName: newCategory.trim(),
-    }).then((category:any) => {
-      setCategories((prevState) => [...prevState, category]);
+      categoryName: newCategory.trim()
+    }).then((category) => {
+      setCategories((prevState: any) => [...prevState, category]);
+      // console.log(categories);
     });
   };
- useEffect(() => {
-   const getCategories = async () => {
-     const categoryList = await getAllCategories();
+  useEffect(() => {
+    const getCategories = async () => {
+      const categoryList = await getAllCategories();
 
-     categoryList && setCategories(categoryList as ICategory[]);
-   };
+      categoryList && setCategories(categoryList as ICategory[]);
+    };
 
-   getCategories();
- }, []);
-  
+    getCategories();
+  }, []);
+
   return (
     <Select onValueChange={onChangeHandler} defaultValue={value}>
       <SelectTrigger className="select-field">
@@ -57,7 +58,7 @@ const Dropdown = ({ value, onChangeHandler }: DropdownProps) => {
       </SelectTrigger>
       <SelectContent>
         {categories.length > 0 &&
-          categories.map((category) => (
+          categories.map((category: { _id: any; name: any }) => (
             <SelectItem
               key={category._id}
               value={category._id}
@@ -79,7 +80,9 @@ const Dropdown = ({ value, onChangeHandler }: DropdownProps) => {
                   type="text"
                   placeholder="Category name"
                   className="input-field mt-3"
-                  onChange={(e) => setNewCategory(e.target.value)}
+                  onChange={(e: { target: { value: any } }) =>
+                    setNewCategory(e.target.value)
+                  }
                 />
               </AlertDialogDescription>
             </AlertDialogHeader>
