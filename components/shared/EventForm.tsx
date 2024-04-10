@@ -1,6 +1,5 @@
 "use client";
-// import { type } from 'os'
-import { z } from "zod";
+
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
@@ -14,24 +13,22 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import React, { useState } from "react";
 import { eventFormSchema } from "@/lib/validator";
+import * as z from "zod";
 import { eventDefaultValues } from "@/constants";
-import DropDown from "./DropDown";
-import { Textarea } from "../ui/textarea";
+import Dropdown from "./DropDown";
+import { Textarea } from "@/components/ui/textarea";
 import { FileUploader } from "./FileUploader";
-import { Checkbox } from "../ui/checkbox";
+import { useState } from "react";
 import Image from "next/image";
 import DatePicker from "react-datepicker";
-import "react-datepicker/dist/react-datepicker.css";
-import { createCategory } from "@/lib/actions/category.action";
-import Dropdown from "./DropDown";
 import { useUploadThing } from "@/lib/uploadthing";
-import { handleError } from "@/lib/utils";
+
+import "react-datepicker/dist/react-datepicker.css";
+import { Checkbox } from "../ui/checkbox";
 import { useRouter } from "next/navigation";
 import { createEvent, updateEvent } from "@/lib/actions/events.action";
 import { IEvent } from "@/lib/database/models/events.model";
-import UpdateEvents from "@/app/(root)/events/[id]/update/page";
 
 type EventFormProps = {
   userId: string;
@@ -41,6 +38,7 @@ type EventFormProps = {
 };
 
 const EventForm = ({ userId, type, event, eventId }: EventFormProps) => {
+  const [files, setFiles] = useState<File[]>([]);
   const initialValues =
     event && type === "Update"
       ? {
@@ -49,9 +47,9 @@ const EventForm = ({ userId, type, event, eventId }: EventFormProps) => {
           endDateTime: new Date(event.endDateTime),
         }
       : eventDefaultValues;
-  const [files, setFiles] = useState<File[]>([]);
-  const { startUpload } = useUploadThing("imageUploader");
   const router = useRouter();
+
+  const { startUpload } = useUploadThing("imageUploader");
 
   const form = useForm<z.infer<typeof eventFormSchema>>({
     resolver: zodResolver(eventFormSchema),
@@ -83,7 +81,9 @@ const EventForm = ({ userId, type, event, eventId }: EventFormProps) => {
           form.reset();
           router.push(`/events/${newEvent._id}`);
         }
-      } catch (error) {}
+      } catch (error) {
+        console.log(error);
+      }
     }
 
     if (type === "Update") {
@@ -91,18 +91,21 @@ const EventForm = ({ userId, type, event, eventId }: EventFormProps) => {
         router.back();
         return;
       }
+
       try {
-        const updateEvents = await updateEvent({
-          event: { ...values, imageUrl: uploadedImageUrl, _id: eventId },
+        const updatedEvent = await updateEvent({
           userId,
-          path: `/events/`,
+          event: { ...values, imageUrl: uploadedImageUrl, _id: eventId },
+          path: `/events/${eventId}`,
         });
 
-        if (updateEvents) {
+        if (updatedEvent) {
           form.reset();
-          router.push(`/events/${updateEvents._id}`);
+          router.push(`/events/${updatedEvent._id}`);
         }
-      } catch (error) {}
+      } catch (error) {
+        console.log(error);
+      }
     }
   }
 
@@ -135,7 +138,7 @@ const EventForm = ({ userId, type, event, eventId }: EventFormProps) => {
             render={({ field }) => (
               <FormItem className="w-full">
                 <FormControl>
-                  <DropDown
+                  <Dropdown
                     onChangeHandler={field.onChange}
                     value={field.value}
                   />
