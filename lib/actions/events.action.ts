@@ -56,7 +56,7 @@ const getCategoryByName = async (name: string) => {
 export async function createEvent({ userId, event, path }: CreateEventParams) {
   try {
     await connectToDatabase();
-
+    // const clerkId=User
     const organizer = await User.findById(userId);
     if (!organizer) throw new Error("Organizer not found");
 
@@ -73,16 +73,14 @@ export async function createEvent({ userId, event, path }: CreateEventParams) {
   }
 }
 
-//TO GET EVENT BY ID
+// GET ONE EVENT BY ID
 export async function getEventById(eventId: string) {
   try {
     await connectToDatabase();
 
     const event = await populateEvent(Event.findById(eventId));
 
-    if (!event) {
-      throw new Error("Event Not Found");
-    }
+    if (!event) throw new Error("Event not found");
 
     return JSON.parse(JSON.stringify(event));
   } catch (error) {
@@ -90,7 +88,42 @@ export async function getEventById(eventId: string) {
   }
 }
 
-//TO FETCH ALL EVENTS
+// UPDATE
+export async function updateEvent({ userId, event, path }: UpdateEventParams) {
+  try {
+    await connectToDatabase();
+
+    const eventToUpdate = await Event.findById(event._id);
+    if (!eventToUpdate || eventToUpdate.organizer.toHexString() !== userId) {
+      throw new Error("Unauthorized or event not found");
+    }
+
+    const updatedEvent = await Event.findByIdAndUpdate(
+      event._id,
+      { ...event, category: event.categoryId },
+      { new: true }
+    );
+    revalidatePath(path);
+
+    return JSON.parse(JSON.stringify(updatedEvent));
+  } catch (error) {
+    handleError(error);
+  }
+}
+
+// DELETE
+export async function deleteEvent({ eventId, path }: DeleteEventParams) {
+  try {
+    await connectToDatabase();
+
+    const deletedEvent = await Event.findByIdAndDelete(eventId);
+    if (deletedEvent) revalidatePath(path);
+  } catch (error) {
+    handleError(error);
+  }
+}
+
+// GET ALL EVENTS
 export async function getAllEvents({
   query,
   limit = 6,
@@ -127,48 +160,11 @@ export async function getAllEvents({
       totalPages: Math.ceil(eventsCount / limit),
     };
   } catch (error) {
-    console.log(error);
-  }
-}
-
-// TO UPDATE AN EVENT DATA
-export async function updateEvent({ userId, event, path }: UpdateEventParams) {
-  try {
-    await connectToDatabase();
-
-    const eventToUpdate = await Event.findById(event._id);
-    if (!eventToUpdate || eventToUpdate.organizer.toHexString() !== userId) {
-      throw new Error("Unauthorized or event not found");
-    }
-
-    const updatedEvent = await Event.findByIdAndUpdate(
-      event._id,
-      { ...event, category: event.categoryId },
-      { new: true }
-    );
-    revalidatePath(path);
-
-    return JSON.parse(JSON.stringify(updatedEvent));
-  } catch (error) {
     handleError(error);
   }
 }
 
-//TO DELETE EVENT BY ID
-export async function deleteEvent({ eventId, path }: DeleteEventParams) {
-  try {
-    await connectToDatabase();
-
-    const deleteEvent = await Event.findByIdAndDelete(eventId);
-
-    if (deleteEvent) revalidatePath(path);
-    throw new Error("Event Not Found");
-  } catch (error) {
-    handleError(error);
-  }
-}
-
-// TO GET ALL EVENTS BY AN ORGANIZER
+// GET EVENTS BY ORGANIZER
 export async function getEventsByUser({
   userId,
   limit = 6,
@@ -197,7 +193,7 @@ export async function getEventsByUser({
   }
 }
 
-// TO GET RELATED EVENTS: EVENTS WITH SAME CATEGORY
+// GET RELATED EVENTS: EVENTS WITH SAME CATEGORY
 export async function getRelatedEventsByCategory({
   categoryId,
   eventId,
