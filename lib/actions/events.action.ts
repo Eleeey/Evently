@@ -31,13 +31,12 @@ const populateEvent = async (query: any) => {
 };
 
 const populateUser = async (query: any) => {
-  return query
-    .populate({
-      path: "organizer",
-      model: User,
-      select: "_id firstName lastName",
-    })
-  }
+  return query.populate({
+    path: "organizer",
+    model: User,
+    select: "_id firstName lastName",
+  });
+};
 // export async function findUser(userId:string){
 //   try{
 //     await connectToDatabase()
@@ -57,7 +56,8 @@ export async function createEvent({ userId, event, path }: CreateEventParams) {
   try {
     await connectToDatabase();
     // const clerkId=User
-    const organizer = await User.findById(userId);
+    const organizer = await User.findOne({ clerkId: userId });
+    
     if (!organizer) throw new Error("Organizer not found");
 
     const newEvent = await Event.create({
