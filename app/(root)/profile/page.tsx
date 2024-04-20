@@ -11,17 +11,17 @@ import React from 'react'
 
 const profilePage = async ({ searchParams }: SearchParamProps) => {
   const { sessionClaims } = auth();
-  const userId = sessionClaims?.userId as string;
-  const userImage = sessionClaims?.userImage as string;
-  const userFirstName = sessionClaims?.userFirstName as string;
-  console.log(userImage, userFirstName);
+  const userName = sessionClaims?.userName as string;
+  // const userImage = sessionClaims?.userImage as string;
+  // const userFirstName = sessionClaims?.userFirstName as string;
+  // console.log(userImage, userFirstName);
   const ordersPage = Number(searchParams?.ordersPage) || 1;
   const eventsPage = Number(searchParams?.eventsPage) || 1;
 
-  const orders = await getOrdersByUser({ userId, page: ordersPage });
+  const orders = await getOrdersByUser({ userName, page: ordersPage });
   const orderedEvents = orders?.data.map((order: IOrder) => order.event) || [];
 
-  const eventsByUser = await getEventsByUser({ userId, page: ordersPage });
+  const eventsByUser = await getEventsByUser({ userName, page: ordersPage });
   return (
     <>
       {/* <section className="flex flex-row w-full">

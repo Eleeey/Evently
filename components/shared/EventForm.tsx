@@ -31,13 +31,13 @@ import { createEvent, updateEvent } from "@/lib/actions/events.action";
 import { IEvent } from "@/lib/database/models/events.model";
 
 type EventFormProps = {
-  userId: string;
+  userName: string;
   type: "Create" | "Update";
   event?: IEvent;
   eventId?: string;
 };
 
-const EventForm = ({ userId, type, event, eventId }: EventFormProps) => {
+const EventForm = ({ userName, type, event, eventId }: EventFormProps) => {
   const [files, setFiles] = useState<File[]>([]);
   
   const initialValues =
@@ -74,7 +74,7 @@ const EventForm = ({ userId, type, event, eventId }: EventFormProps) => {
       try {
         const newEvent = await createEvent({
           event: { ...values, imageUrl: uploadedImageUrl },
-          userId,
+          userName,
           path: "/profile",
         });
 
@@ -95,7 +95,7 @@ const EventForm = ({ userId, type, event, eventId }: EventFormProps) => {
 
       try {
         const updatedEvent = await updateEvent({
-          userId,
+          userName,
           event: { ...values, imageUrl: uploadedImageUrl, _id: eventId },
           path: `/events/${eventId}`,
         });

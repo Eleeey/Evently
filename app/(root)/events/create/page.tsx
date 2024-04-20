@@ -9,8 +9,8 @@ const CreateEvents = () => {
 
   const {sessionClaims}= auth()
 
-  const userId = sessionClaims?.userId as string
-  console.log(userId)
+  const userName = sessionClaims?.userName as string
+  // console.log(userName)
   return (
     <>
         <section className="bg-primary-50 bg-dotted-pattern bg-cover bg-center py-5 md:py-10">
@@ -20,7 +20,7 @@ const CreateEvents = () => {
         </section>
 
         <div className="wrapper my-8">
-          <EventForm userId={userId}  type="Create" />
+          <EventForm userName={userName}  type="Create" />
         </div>
       </>
 
