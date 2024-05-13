@@ -13,7 +13,7 @@ const UpdateEvents = async ({ params: { id } }: UpdateEventProps) => {
   const event = await getEventById(id);
   const { sessionClaims } = auth();
 
-  const userId = sessionClaims?.userId as string;
+  const userName = sessionClaims?.userName as string;
   return (
     <>
       <section className="bg-primary-50 bg-dotted-pattern bg-cover bg-center py-5 md:py-10">
@@ -24,7 +24,7 @@ const UpdateEvents = async ({ params: { id } }: UpdateEventProps) => {
 
       <div className="wrapper my-8">
         <EventForm
-          userId={userId}
+          userName={userName}
           event={event}
           eventId={event._id}
           type="Update"
